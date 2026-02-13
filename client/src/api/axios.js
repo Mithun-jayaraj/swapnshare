@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: 'https://swapnshare.onrender.com/api',
 });
 
 // Attach token on every request
