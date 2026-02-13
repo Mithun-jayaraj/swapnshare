@@ -5,23 +5,23 @@ import protect from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Helper: generate JWT token
+// 🔑 Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
-// POST /api/register
+// ================= REGISTER =================
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, latitude, longitude } = req.body;
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists with this email' });
+      return res
+        .status(400)
+        .json({ message: 'User already exists with this email' });
     }
 
-    // Create new user
     const user = await User.create({
       name,
       email,
@@ -48,24 +48,22 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// POST /api/login
+// ================= LOGIN =================
 router.post('/login', async (req, res) => {
   try {
     const { email, password, latitude, longitude } = req.body;
 
-    // Find user
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    // Update location if provided
+    // Update location
     if (latitude && longitude) {
       user.latitude = latitude;
       user.longitude = longitude;
@@ -90,27 +88,34 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// GET /api/me  – get current user profile
+// ================= GET PROFILE =================
 router.get('/me', protect, async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
       .select('-password')
       .populate('savedItems');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// PUT /api/me  – update location
+// ================= UPDATE LOCATION =================
 router.put('/me', protect, async (req, res) => {
   try {
     const { latitude, longitude } = req.body;
+
     const user = await User.findByIdAndUpdate(
       req.user._id,
       { latitude, longitude },
       { new: true }
     ).select('-password');
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
