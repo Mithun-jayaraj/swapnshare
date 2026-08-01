@@ -12,11 +12,16 @@ const generateToken = (id) => {
 
 // ================= REGISTER =================
 router.post('/register', async (req, res) => {
+  console.log('========== REGISTER REQUEST ==========');
+  console.log(req.body);
+
   try {
     const { name, email, password, latitude, longitude } = req.body;
 
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
+      console.log('❌ User already exists');
       return res
         .status(400)
         .json({ message: 'User already exists with this email' });
@@ -29,6 +34,8 @@ router.post('/register', async (req, res) => {
       latitude: latitude || null,
       longitude: longitude || null,
     });
+
+    console.log('✅ User created:', user.email);
 
     const token = generateToken(user._id);
 
@@ -44,26 +51,39 @@ router.post('/register', async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('❌ REGISTER ERROR:');
+    console.error(error);
+
+    res.status(500).json({
+      message: error.message,
+    });
   }
 });
 
 // ================= LOGIN =================
 router.post('/login', async (req, res) => {
+  console.log('========== LOGIN REQUEST ==========');
+  console.log(req.body);
+
   try {
     const { email, password, latitude, longitude } = req.body;
 
     const user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+      return res.status(400).json({
+        message: 'Invalid email or password',
+      });
     }
 
     const isMatch = await user.comparePassword(password);
+
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+      return res.status(400).json({
+        message: 'Invalid email or password',
+      });
     }
 
-    // Update location
     if (latitude && longitude) {
       user.latitude = latitude;
       user.longitude = longitude;
@@ -84,7 +104,12 @@ router.post('/login', async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('❌ LOGIN ERROR:');
+    console.error(error);
+
+    res.status(500).json({
+      message: error.message,
+    });
   }
 });
 
@@ -96,12 +121,18 @@ router.get('/me', protect, async (req, res) => {
       .populate('savedItems');
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({
+        message: 'User not found',
+      });
     }
 
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+
+    res.status(500).json({
+      message: error.message,
+    });
   }
 });
 
@@ -118,7 +149,11 @@ router.put('/me', protect, async (req, res) => {
 
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+
+    res.status(500).json({
+      message: error.message,
+    });
   }
 });
 

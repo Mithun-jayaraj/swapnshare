@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import dns from 'dns';
 
 import authRoutes from './routes/auth.js';
 import itemRoutes from './routes/items.js';
@@ -10,10 +11,38 @@ import bookmarkRoutes from './routes/bookmarks.js';
 
 dotenv.config();
 
+
+console.log("MONGO_URI:", process.env.MONGO_URI);
+console.log("Current working directory:", process.cwd());
 const app = express();
+const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET'];
+const missingEnvVars = requiredEnvVars.filter((key) => !process.env[key]);
+
+if (missingEnvVars.length > 0) {
+  console.error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  process.exit(1);
+}
+
+const allowedOrigins = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const corsOptions =
+  allowedOrigins.length > 0
+    ? {
+        origin: (origin, callback) => {
+          if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+            return;
+          }
+          callback(new Error('Not allowed by CORS'));
+        },
+      }
+    : {};
 
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
