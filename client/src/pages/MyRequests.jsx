@@ -48,7 +48,7 @@ function MyRequests() {
     const otherUser = isReceived ? req.fromUser : req.toUser;
     
     return (
-      <div className="card mb-4" style={{ display: 'flex', flexDirection: 'row', gap: '20px', padding: '20px' }}>
+      <div className="glass-card mb-4" style={{ display: 'flex', flexDirection: 'row', gap: '20px', padding: '20px' }}>
         <img 
           src={getItemImage(item)} 
           alt={item.title || 'Deleted item'} 
@@ -57,14 +57,15 @@ function MyRequests() {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <h3 style={{ fontSize: '1.1rem', marginBottom: '4px', color: 'var(--color-primary)' }}>
+              <h3 style={{ fontSize: '1.1rem', marginBottom: '4px', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 {item.title || 'Deleted item'}
+                {item.category && <span className="badge" style={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white', fontSize: '0.7rem' }}>{item.category}</span>}
               </h3>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '8px' }}>
+              <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.9rem', marginBottom: '8px' }}>
                 {isReceived ? 'Requested by ' : 'Requested from '}
                 <strong>{otherUser?.name || 'Unknown'}</strong> ({otherUser?.email})
               </p>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>
                 {new Date(req.createdAt).toLocaleDateString(undefined, { 
                   year: 'numeric', month: 'short', day: 'numeric' 
                 })}
@@ -102,26 +103,27 @@ function MyRequests() {
   };
 
   return (
-    <div className="page-wrapper container">
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ color: 'var(--color-primary)' }}>Swap Requests</h1>
-        <p style={{ color: 'var(--color-text-muted)' }}>Manage your community exchanges.</p>
-      </div>
-
-      {error && (
-        <div className="mb-4 p-3" style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', borderRadius: 'var(--radius-sm)', border: '1px solid #f5c2be' }}>
-          {error}
+    <div className="glass-container" style={{ backgroundImage: 'url(/images/bg_requests.jpg)', minHeight: 'calc(100vh - 72px)' }}>
+      <div className="container glass-content" style={{ padding: '40px 20px' }}>
+        <div style={{ marginBottom: '32px' }}>
+          <h1 style={{ color: 'white' }}>Swap Requests</h1>
+          <p style={{ color: 'rgba(255,255,255,0.8)' }}>Manage your community exchanges.</p>
         </div>
-      )}
+
+        {error && (
+          <div className="mb-4 p-3" style={{ backgroundColor: 'var(--color-danger)', color: 'white', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.2)' }}>
+            {error}
+          </div>
+        )}
 
       {/* TABS */}
-      <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid var(--color-border)', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid rgba(255,255,255,0.2)', marginBottom: '24px' }}>
         <button 
           onClick={() => setActiveTab('received')}
           style={{ 
             background: 'none', border: 'none', padding: '12px 16px', fontSize: '1rem', fontWeight: 600, cursor: 'pointer',
-            borderBottom: activeTab === 'received' ? '3px solid var(--color-primary)' : '3px solid transparent',
-            color: activeTab === 'received' ? 'var(--color-primary)' : 'var(--color-text-muted)',
+            borderBottom: activeTab === 'received' ? '3px solid var(--color-secondary)' : '3px solid transparent',
+            color: activeTab === 'received' ? 'white' : 'rgba(255,255,255,0.6)',
             transition: 'all var(--transition-fast)'
           }}
         >
@@ -131,8 +133,8 @@ function MyRequests() {
           onClick={() => setActiveTab('sent')}
           style={{ 
             background: 'none', border: 'none', padding: '12px 16px', fontSize: '1rem', fontWeight: 600, cursor: 'pointer',
-            borderBottom: activeTab === 'sent' ? '3px solid var(--color-primary)' : '3px solid transparent',
-            color: activeTab === 'sent' ? 'var(--color-primary)' : 'var(--color-text-muted)',
+            borderBottom: activeTab === 'sent' ? '3px solid var(--color-secondary)' : '3px solid transparent',
+            color: activeTab === 'sent' ? 'white' : 'rgba(255,255,255,0.6)',
             transition: 'all var(--transition-fast)'
           }}
         >
@@ -142,16 +144,16 @@ function MyRequests() {
 
       {/* CONTENT */}
       {loading ? (
-        <div style={{ padding: '20px', backgroundColor: 'var(--color-surface)', borderRadius: 'var(--radius-md)' }}>
+        <div className="glass-card" style={{ padding: '20px' }}>
           <SkeletonText height="24px" width="60%" />
           <SkeletonText height="16px" width="40%" />
         </div>
       ) : activeTab === 'received' ? (
         <div>
           {received.length === 0 ? (
-            <div className="empty-state">
+            <div className="glass-card" style={{ padding: '40px', textAlign: 'center' }}>
               <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>You're all caught up.</h3>
-              <p>When someone requests your items, they'll appear here.</p>
+              <p style={{ opacity: 0.8 }}>When someone requests your items, they'll appear here.</p>
             </div>
           ) : (
             received.map((req) => (
@@ -162,9 +164,9 @@ function MyRequests() {
       ) : (
         <div>
           {sent.length === 0 ? (
-            <div className="empty-state">
+            <div className="glass-card" style={{ padding: '40px', textAlign: 'center' }}>
               <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>You haven't requested a swap yet.</h3>
-              <p>Browse items in the marketplace and request what you need.</p>
+              <p style={{ opacity: 0.8 }}>Browse items in the marketplace and request what you need.</p>
             </div>
           ) : (
             sent.map((req) => (
@@ -173,6 +175,7 @@ function MyRequests() {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
-import Input from '../components/Input';
 import Button from '../components/Button';
 
 function Register() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ 
+    name: '', 
+    email: '', 
+    mobileNumber: '',
+    city: '',
+    password: '' 
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -19,7 +24,7 @@ function Register() {
     e.preventDefault();
     setError('');
     
-    if (!formData.name || !formData.email || !formData.password) {
+    if (!formData.name || !formData.email || !formData.password || !formData.mobileNumber || !formData.city) {
       setError('Please fill in all fields.');
       return;
     }
@@ -36,7 +41,7 @@ function Register() {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       window.dispatchEvent(new Event('storage'));
-      navigate('/');
+      navigate('/explore');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
@@ -45,37 +50,29 @@ function Register() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', backgroundColor: 'var(--color-bg)' }}>
-      {/* Left side - Image */}
-      <div style={{ flex: 1, display: 'none', '@media (minWidth: 768px)': { display: 'block' } }} className="auth-image-container">
-        <img 
-          src="/images/vegetables.jpg" 
-          alt="Fresh vegetables" 
-          style={{ width: '100%', height: '100vh', objectFit: 'cover' }}
-        />
-      </div>
+    <div className="glass-container" style={{ backgroundImage: 'url(/images/hero_items_collage.jpg)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      
+      <div className="glass-content glass-card" style={{ maxWidth: '450px', width: '100%', padding: '40px', borderRadius: 'var(--radius-lg)' }}>
+        
+        <div className="text-center" style={{ marginBottom: '32px' }}>
+          <Link to="/" style={{ display: 'inline-block', marginBottom: '16px', fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 800, color: 'white' }}>
+            <span style={{ color: 'var(--color-secondary)' }}>🌿</span> SwapNShare
+          </Link>
+          <h1 style={{ fontSize: '1.75rem', marginBottom: '8px', color: 'white' }}>Create an Account</h1>
+          <p style={{ opacity: 0.8, color: 'white' }}>Join the neighborhood marketplace.</p>
+        </div>
 
-      {/* Right side - Form */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px' }}>
-        <div style={{ maxWidth: '400px', width: '100%' }}>
-          
-          <div className="text-center" style={{ marginBottom: '40px' }}>
-            <Link to="/" style={{ display: 'inline-block', marginBottom: '24px', fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 800, color: 'var(--color-primary)' }}>
-              <span style={{ color: 'var(--color-secondary)' }}>🌿</span> SwapNShare
-            </Link>
-            <h1 style={{ fontSize: '1.75rem', marginBottom: '8px' }}>Join the community</h1>
-            <p style={{ color: 'var(--color-text-muted)' }}>Create an account to start sharing with your neighbors.</p>
+        {error && (
+          <div className="mb-4 p-3" style={{ backgroundColor: 'var(--color-danger)', color: 'white', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.2)' }}>
+            {error}
           </div>
+        )}
 
-          {error && (
-            <div className="mb-4 p-3" style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', borderRadius: 'var(--radius-sm)', border: '1px solid #f5c2be' }}>
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit}>
-            <Input
-              label="Full Name"
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: '16px' }}>
+            <label className="form-label" style={{ color: 'white' }}>Full Name</label>
+            <input
+              className="form-control"
               type="text"
               name="name"
               placeholder="Jane Doe"
@@ -83,9 +80,12 @@ function Register() {
               onChange={handleChange}
               required
             />
+          </div>
 
-            <Input
-              label="Email Address"
+          <div style={{ marginBottom: '16px' }}>
+            <label className="form-label" style={{ color: 'white' }}>Email Address</label>
+            <input
+              className="form-control"
               type="email"
               name="email"
               placeholder="you@example.com"
@@ -93,42 +93,66 @@ function Register() {
               onChange={handleChange}
               required
             />
-            
-            <div style={{ position: 'relative' }}>
-              <Input
-                label="Password"
-                type={showPassword ? 'text' : 'password'}
-                name="password"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-              <button 
-                type="button" 
-                onClick={() => setShowPassword(!showPassword)}
-                style={{ position: 'absolute', right: '12px', top: '38px', background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
-              >
-                {showPassword ? 'Hide' : 'Show'}
-              </button>
-            </div>
+          </div>
 
-            <Button type="submit" variant="primary" block style={{ marginTop: '24px', padding: '12px' }} disabled={loading}>
-              {loading ? 'Creating account...' : 'Create Account'}
-            </Button>
-          </form>
+          <div style={{ marginBottom: '16px' }}>
+            <label className="form-label" style={{ color: 'white' }}>Mobile Number</label>
+            <input
+              className="form-control"
+              type="text"
+              name="mobileNumber"
+              placeholder="+1234567890"
+              value={formData.mobileNumber}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-          <p style={{ textAlign: 'center', marginTop: '32px', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-            Already have an account? <Link to="/login" style={{ fontWeight: 600, color: 'var(--color-primary)' }}>Sign in</Link>
-          </p>
-        </div>
+          <div style={{ marginBottom: '16px' }}>
+            <label className="form-label" style={{ color: 'white' }}>City</label>
+            <input
+              className="form-control"
+              type="text"
+              name="city"
+              placeholder="e.g. San Francisco"
+              value={formData.city}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          
+          <div style={{ position: 'relative', marginBottom: '24px' }}>
+            <label className="form-label" style={{ color: 'white' }}>Password</label>
+            <input
+              className="form-control"
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              minLength={6}
+              style={{ paddingRight: '60px' }}
+            />
+            <button 
+              type="button" 
+              onClick={() => setShowPassword(!showPassword)}
+              style={{ position: 'absolute', right: '12px', top: '38px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '0.85rem' }}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
+
+          <Button type="submit" variant="primary" block style={{ padding: '12px', fontSize: '1.05rem', backgroundColor: 'var(--color-secondary)', border: 'none' }} disabled={loading}>
+            {loading ? 'Creating account...' : 'Create Account'}
+          </Button>
+        </form>
+
+        <p style={{ textAlign: 'center', marginTop: '32px', color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
+          Already have an account? <Link to="/login" style={{ fontWeight: 600, color: 'white', textDecoration: 'underline' }}>Log In</Link>
+        </p>
       </div>
-      
-      <style>{`
-        @media (max-width: 768px) {
-          .auth-image-container { display: none !important; }
-        }
-      `}</style>
+
     </div>
   );
 }

@@ -1,24 +1,33 @@
 // Image helper for frontend mapping
 
 export const getItemImage = (item) => {
-  if (!item || !item.title) return '/images/default_item.jpg';
+  if (!item) return '/images/category_other.jpg';
 
-  const lowerTitle = item.title.toLowerCase();
-  const lowerDesc = item.description ? item.description.toLowerCase() : '';
-
-  // Simple keyword matching for images
-  if (lowerTitle.includes('vegetable') || lowerTitle.includes('spinach') || lowerDesc.includes('vegetable') || lowerTitle.includes('tomato')) {
-    return '/images/vegetables.jpg';
+  // If user provided an image URL, use it
+  if (item.imageUrl && item.imageUrl.trim() !== '') {
+    return item.imageUrl;
   }
+
+  // Fallback to category specific images or keywords
+  const category = item.category || 'Other';
+  const lowerTitle = (item.title || '').toLowerCase();
   
-  if (lowerTitle.includes('fruit') || lowerTitle.includes('apple') || lowerTitle.includes('orange') || lowerTitle.includes('banana') || lowerDesc.includes('fruit')) {
-    return '/images/fruits.jpg';
-  }
-  
-  if (lowerTitle.includes('book') || lowerTitle.includes('plant') || lowerTitle.includes('kitchen') || lowerTitle.includes('household') || lowerDesc.includes('book')) {
-    return '/images/household.jpg';
+  if (lowerTitle.includes('fridge') || lowerTitle.includes('refrigerator') || lowerTitle.includes('appliance')) {
+    return '/images/category_appliances.jpg';
   }
 
-  // Fallback generic marketplace image
-  return '/images/default_item.jpg';
+  switch (category) {
+    case 'Groceries':
+    case 'Food':
+      return '/images/category_groceries.jpg';
+    case 'Furniture':
+      return '/images/category_furniture.jpg';
+    case 'Electronics':
+      return '/images/category_electronics.jpg';
+    case 'Household':
+    case 'Kitchen':
+      return '/images/category_appliances.jpg';
+    default:
+      return '/images/category_other.jpg';
+  }
 };

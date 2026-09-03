@@ -31,7 +31,7 @@ function Login() {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       window.dispatchEvent(new Event('storage'));
-      navigate('/');
+      navigate('/explore');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -40,37 +40,29 @@ function Login() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', backgroundColor: 'var(--color-bg)' }}>
-      {/* Left side - Image */}
-      <div style={{ flex: 1, display: 'none', '@media (minWidth: 768px)': { display: 'block' } }} className="auth-image-container">
-        <img 
-          src="/images/hero_community.jpg" 
-          alt="Community sharing" 
-          style={{ width: '100%', height: '100vh', objectFit: 'cover' }}
-        />
-      </div>
+    <div className="glass-container" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      
+      <div className="glass-content glass-card" style={{ maxWidth: '450px', width: '100%', padding: '40px', borderRadius: 'var(--radius-lg)' }}>
+        
+        <div className="text-center" style={{ marginBottom: '32px' }}>
+          <Link to="/" style={{ display: 'inline-block', marginBottom: '16px', fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 800, color: 'white' }}>
+            <span style={{ color: 'var(--color-secondary)' }}>🌿</span> SwapNShare
+          </Link>
+          <h1 style={{ fontSize: '1.75rem', marginBottom: '8px' }}>Welcome back</h1>
+          <p style={{ opacity: 0.8 }}>Enter your details to access the neighborhood marketplace.</p>
+        </div>
 
-      {/* Right side - Form */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px' }}>
-        <div style={{ maxWidth: '400px', width: '100%' }}>
-          
-          <div className="text-center" style={{ marginBottom: '40px' }}>
-            <Link to="/" style={{ display: 'inline-block', marginBottom: '24px', fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 800, color: 'var(--color-primary)' }}>
-              <span style={{ color: 'var(--color-secondary)' }}>🌿</span> SwapNShare
-            </Link>
-            <h1 style={{ fontSize: '1.75rem', marginBottom: '8px' }}>Welcome back</h1>
-            <p style={{ color: 'var(--color-text-muted)' }}>Enter your details to access the neighborhood marketplace.</p>
+        {error && (
+          <div className="mb-4 p-3" style={{ backgroundColor: 'var(--color-danger)', color: 'white', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.2)' }}>
+            {error}
           </div>
+        )}
 
-          {error && (
-            <div className="mb-4 p-3" style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', borderRadius: 'var(--radius-sm)', border: '1px solid #f5c2be' }}>
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit}>
-            <Input
-              label="Email Address"
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: '16px' }}>
+            <label className="form-label">Email Address</label>
+            <input
+              className="form-control"
               type="email"
               name="email"
               placeholder="you@example.com"
@@ -78,42 +70,39 @@ function Login() {
               onChange={handleChange}
               required
             />
-            
-            <div style={{ position: 'relative' }}>
-              <Input
-                label="Password"
-                type={showPassword ? 'text' : 'password'}
-                name="password"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-              <button 
-                type="button" 
-                onClick={() => setShowPassword(!showPassword)}
-                style={{ position: 'absolute', right: '12px', top: '38px', background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
-              >
-                {showPassword ? 'Hide' : 'Show'}
-              </button>
-            </div>
+          </div>
+          
+          <div style={{ position: 'relative', marginBottom: '24px' }}>
+            <label className="form-label">Password</label>
+            <input
+              className="form-control"
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              style={{ paddingRight: '60px' }}
+            />
+            <button 
+              type="button" 
+              onClick={() => setShowPassword(!showPassword)}
+              style={{ position: 'absolute', right: '12px', top: '38px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '0.85rem' }}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
 
-            <Button type="submit" variant="primary" block style={{ marginTop: '24px', padding: '12px' }} disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </form>
+          <Button type="submit" variant="primary" block style={{ padding: '12px', fontSize: '1.05rem', backgroundColor: 'var(--color-secondary)', border: 'none' }} disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign In'}
+          </Button>
+        </form>
 
-          <p style={{ textAlign: 'center', marginTop: '32px', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-            Don't have an account? <Link to="/register" style={{ fontWeight: 600, color: 'var(--color-primary)' }}>Sign up</Link>
-          </p>
-        </div>
+        <p style={{ textAlign: 'center', marginTop: '32px', color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem' }}>
+          Don't have an account? <Link to="/register" style={{ fontWeight: 600, color: 'white', textDecoration: 'underline' }}>Sign up</Link>
+        </p>
       </div>
-      
-      <style>{`
-        @media (max-width: 768px) {
-          .auth-image-container { display: none !important; }
-        }
-      `}</style>
+
     </div>
   );
 }

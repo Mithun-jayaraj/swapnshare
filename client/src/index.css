@@ -49,6 +49,24 @@
   --transition-normal: 0.3s ease;
 }
 
+.dark-theme {
+  --color-bg: #121212;
+  --color-surface: #1E1E1E;
+  --color-surface-hover: #2D2D2D;
+  --color-text-main: #E0E0E0;
+  --color-text-muted: #A0A0A0;
+  --color-border: #333333;
+  
+  --color-primary: #3DA86B; 
+  --color-primary-light: #4EC07C;
+  --color-secondary: #56B57E;
+  --color-secondary-light: #1A3626;
+  
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.6);
+  --shadow-lg: 0 12px 24px rgba(0,0,0,0.8);
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -456,6 +474,69 @@ textarea.form-control {
 @keyframes loading {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* Glassmorphism */
+.glass-container {
+  background-image: url('/images/hero_items_collage.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+.glass-container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+  transition: background-color var(--transition-normal);
+}
+
+.dark-theme .glass-container::before {
+  background-color: rgba(0, 0, 0, 0.85); /* Much darker overlay in dark mode */
+}
+
+.glass-content {
+  position: relative;
+  z-index: 2;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  color: white;
+  transition: background var(--transition-normal), border var(--transition-normal);
+}
+
+.dark-theme .glass-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card h1, .glass-card h2, .glass-card h3, .glass-card p, .glass-card label {
+  color: white;
+}
+
+.glass-card .form-control {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.glass-card .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.glass-card .form-control:focus {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
 
 /* =========================================

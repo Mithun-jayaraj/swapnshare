@@ -3,6 +3,7 @@ import Navbar from './components/Navbar'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Home from './pages/Home'
+import Landing from './pages/Landing'
 import AddItem from './pages/AddItem'
 import MyRequests from './pages/MyRequests'
 
@@ -18,6 +19,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public Landing Page */}
+        <Route path="/" element={<Landing />} />
+
         {/* Auth pages — no navbar */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -29,7 +33,7 @@ function App() {
             <PrivateRoute>
               <Navbar />
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/explore" element={<Home />} />
                 <Route path="/add" element={<AddItem />} />
                 <Route path="/my-requests" element={<MyRequests />} />
               </Routes>

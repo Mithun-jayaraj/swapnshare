@@ -14,10 +14,19 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    mobileNumber: {
+      type: String,
+      trim: true,
+    },
     password: {
       type: String,
       required: [true, 'Password is required'],
       minlength: 6,
+    },
+    location: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      city: { type: String }
     },
   },
   { timestamps: true }

@@ -15,6 +15,12 @@ function Home() {
   // Search & Sort state
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('newest'); // 'newest' | 'oldest'
+  
+  // New Filters
+  const [categoryFilter, setCategoryFilter] = useState('All');
+  const [distanceFilter, setDistanceFilter] = useState('any'); // '1', '5', '10', '25', '50', 'any'
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationStatus, setLocationStatus] = useState('');
 
   // Actions state
   const [requestingId, setRequestingId] = useState(null);
@@ -28,20 +34,49 @@ function Home() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const isLoggedIn = !!user.id;
 
-  // Fetch all items on mount
+  // Fetch all items on mount and when filters change
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [categoryFilter, distanceFilter, userLocation]);
 
   const fetchItems = async () => {
+    setLoading(true);
     try {
-      const res = await api.get('/items');
+      let url = '/items?';
+      if (categoryFilter !== 'All') url += `category=${categoryFilter}&`;
+      if (userLocation && userLocation.latitude) {
+        url += `lat=${userLocation.latitude}&lng=${userLocation.longitude}&`;
+        if (distanceFilter !== 'any') {
+           url += `radius=${distanceFilter}&`;
+        }
+      }
+      const res = await api.get(url);
       setItems(res.data);
     } catch (err) {
       setError('Something went wrong while loading the marketplace.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus('Geolocation not supported');
+      return;
+    }
+    setLocationStatus('Locating...');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        });
+        setLocationStatus('📍 Location Set');
+      },
+      () => {
+        setLocationStatus('Unable to get location');
+      }
+    );
   };
 
   // Filter and Sort items
@@ -105,68 +140,93 @@ function Home() {
   };
 
   return (
-    <div className="page-wrapper">
-      <div className="container">
-        
-        {/* HERO SECTION */}
-        <div className="hero">
-          <div className="hero-content">
-            <h1 className="hero-title">Share more. Waste less. Build your neighborhood.</h1>
-            <p className="hero-subtitle">
-              Give useful food and household items a second life by sharing them with people in your community.
-            </p>
-            <div className="hero-actions">
-              <Button variant="primary" onClick={() => document.getElementById('marketplace').scrollIntoView({ behavior: 'smooth' })}>
-                Browse Items
-              </Button>
-              <Link to="/add">
-                <Button variant="secondary">Share an Item</Button>
-              </Link>
-            </div>
-          </div>
-          <img 
-            src="/images/hero_community.jpg" 
-            alt="Community sharing food" 
-            className="hero-image" 
-          />
+    <div className="glass-container" style={{ backgroundImage: 'url(/images/bg_explore.jpg)', minHeight: 'calc(100vh - 72px)', display: 'flex', flexDirection: 'column' }}>
+      
+      {successMsg && (
+        <div className="mb-4 p-3 glass-content" style={{ backgroundColor: 'var(--color-success)', color: 'white', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.2)', margin: '20px' }}>
+          {successMsg}
         </div>
+      )}
+      {error && (
+        <div className="mb-4 p-3 glass-content" style={{ backgroundColor: 'var(--color-danger)', color: 'white', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.2)', margin: '20px' }}>
+          {error}
+        </div>
+      )}
 
-        {/* NOTIFICATIONS */}
-        {successMsg && (
-          <div className="mb-4 p-3" style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)', borderRadius: 'var(--radius-sm)', border: '1px solid #b7e4c7' }}>
-            {successMsg}
-          </div>
-        )}
-        {error && (
-          <div className="mb-4 p-3" style={{ backgroundColor: 'var(--color-danger-bg)', color: 'var(--color-danger)', borderRadius: 'var(--radius-sm)', border: '1px solid #f5c2be' }}>
-            {error}
-          </div>
-        )}
-
+      <div className="container glass-content" style={{ flex: 1, padding: '40px 20px' }}>
         {/* MARKETPLACE SECTION */}
-        <div id="marketplace" style={{ paddingTop: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-            <h2>Neighborhood Marketplace</h2>
-            
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <div style={{ width: '250px' }}>
-                <Input 
-                  type="text" 
-                  placeholder="Search items..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ padding: '8px 12px', margin: 0 }}
-                />
+        <div id="marketplace">
+          <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px', padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+              <h2>Neighborhood Marketplace</h2>
+              
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <div style={{ width: '200px' }}>
+                  <Input 
+                    type="text" 
+                    placeholder="Search items..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{ padding: '8px 12px', margin: 0 }}
+                  />
+                </div>
+                <select 
+                  className="form-control" 
+                  style={{ width: 'auto', padding: '8px 12px' }}
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                >
+                  <option value="All">All Categories</option>
+                  <option value="Groceries">Groceries</option>
+                  <option value="Food">Food</option>
+                  <option value="Kitchen">Kitchen</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Furniture">Furniture</option>
+                  <option value="Books">Books</option>
+                  <option value="Clothing">Clothing</option>
+                  <option value="Plants">Plants</option>
+                  <option value="Sports">Sports</option>
+                  <option value="Household">Household</option>
+                  <option value="Other">Other</option>
+                </select>
+                <select 
+                  className="form-control" 
+                  style={{ width: 'auto', padding: '8px 12px' }}
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                </select>
               </div>
+            </div>
+
+            {/* Distance Filter Bar */}
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '12px', flexWrap: 'wrap' }}>
+              <span style={{ fontWeight: 600 }}>Distance:</span>
               <select 
                 className="form-control" 
-                style={{ width: 'auto', padding: '8px 12px' }}
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value)}
+                style={{ width: 'auto', padding: '6px 12px' }}
+                value={distanceFilter}
+                onChange={(e) => setDistanceFilter(e.target.value)}
+                disabled={!userLocation}
               >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
+                <option value="any">Any distance</option>
+                <option value="1">Within 1 km</option>
+                <option value="5">Within 5 km</option>
+                <option value="10">Within 10 km</option>
+                <option value="25">Within 25 km</option>
+                <option value="50">Within 50 km</option>
               </select>
+              {!userLocation ? (
+                <Button variant="secondary" size="sm" onClick={handleGetLocation}>
+                  📍 Set my location to filter
+                </Button>
+              ) : (
+                <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                  {locationStatus}
+                </span>
+              )}
             </div>
           </div>
 
@@ -175,7 +235,7 @@ function Home() {
               {[1, 2, 3, 4, 5, 6].map(n => <SkeletonCard key={n} />)}
             </div>
           ) : displayedItems.length === 0 ? (
-            <div className="empty-state">
+            <div className="glass-card" style={{ padding: '40px', textAlign: 'center' }}>
               <h3 style={{ fontSize: '1.5rem', marginBottom: '12px' }}>Nothing shared yet</h3>
               <p>Be the first neighbor to share something useful.</p>
               <Link to="/add">
@@ -196,7 +256,6 @@ function Home() {
             </div>
           )}
         </div>
-
       </div>
 
       {/* Delete Confirmation Modal */}

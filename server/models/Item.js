@@ -17,6 +17,19 @@ const itemSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    category: {
+      type: String,
+      default: 'Other',
+    },
+    imageUrl: {
+      type: String,
+      default: '',
+    },
+    location: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      city: { type: String }
+    },
   },
   { timestamps: true }
 );
